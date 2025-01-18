@@ -5,6 +5,8 @@
 //  Created by mdigix on 2025/01/18.
 //
 
+
+
 import SwiftUI
 @preconcurrency import WeatherKit
 import CoreLocation
@@ -39,5 +41,13 @@ struct WeatherView: View {
         }
     }
 }
+                    
+                
+            
+        
+    
+
+
+
 
 
