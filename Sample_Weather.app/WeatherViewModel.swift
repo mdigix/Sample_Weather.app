@@ -13,16 +13,24 @@ struct WeatherView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            Text("Current Temperature")
-                .font(.headline)
-            
-            Text(viewModel.currentTemperature)
+            Text(viewModel.locationName) // 地名を表示
                 .font(.largeTitle)
                 .bold()
             
-            Text(viewModel.weatherDescription)
-                .font(.subheadline)
-                .foregroundColor(.gray)
+            Text(viewModel.currentTemperature) // 温度を表示
+                .font(.title)
+            
+            Button(action: {
+                Task {
+                    await viewModel.fetchWeather()
+                }
+            }) {
+                Text("Refresh")
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+            }
         }
         .padding()
         .task {
