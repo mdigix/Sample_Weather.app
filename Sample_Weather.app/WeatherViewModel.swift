@@ -2,7 +2,7 @@
 //  WeatherViewModel.swift
 //  Sample_Weather.app
 //
-//  Created by Yoshinori Midoritani on 2025/01/18.
+//  Created by mdigix on 2025/01/18.
 //
 import SwiftUI
 @preconcurrency import WeatherKit

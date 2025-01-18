@@ -2,23 +2,41 @@
 //  ContentView.swift
 //  Sample_Weather.app
 //
-//  Created by Yoshinori Midoritani on 2025/01/18.
+//  Created by mdigix on 2025/01/18.
 //
 
 import SwiftUI
 
-struct ContentView: View {
+struct WeatherView: View {
+    @StateObject private var viewModel = WeatherViewModel()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        VStack(spacing: 20) {
+            Text("Current Temperature")
+                .font(.headline)
+            
+            Text(viewModel.currentTemperature)
+                .font(.largeTitle)
+                .bold()
+            
+            Text(viewModel.weatherDescription)
+                .font(.subheadline)
+                .foregroundColor(.gray)
         }
         .padding()
+        .task {
+            await viewModel.fetchWeather()
+        }
     }
 }
 
-#Preview {
-    ContentView()
+
+struct WeatherKitApp: App {
+    var body: some Scene {
+        WindowGroup {
+            WeatherView() // ここでWeatherViewを表示
+        }
+    }
 }
+
+
