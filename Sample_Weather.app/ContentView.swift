@@ -9,43 +9,33 @@ import SwiftUI
 @preconcurrency import WeatherKit
 import CoreLocation
 
-@MainActor
-class WeatherViewModel: ObservableObject {
-    private let weatherService = WeatherService()
-    private let geoCoder = CLGeocoder()
+struct WeatherView: View {
+    @StateObject private var viewModel = WeatherViewModel()
     
-    @Published var locationName: String = "UnKnown Location"
-    @Published var currentTemperature: String = "Loading..."
-    
-    func fetchWeather() async {
-        // サンプル位置情報: 緯度と経度（東京の座標）
-        let location = CLLocation(latitude: 35.6895, longitude: 139.6917)
-        
-        do {
-            let placemarks = try await geoCoder.reverseGeocodeLocation(location)
-            if let placemark = placemarks.first {
-                self.locationName = placemark.locality ?? "Unknown City"
+    var body: some View {
+        VStack(spacing: 20) {
+            Text(viewModel.locationName) // 地名を表示
+                .font(.largeTitle)
+                .bold()
             
+            Text(viewModel.currentTemperature) // 温度を表示
+                .font(.title)
+            
+            Button(action: {
+                Task {
+                    await viewModel.fetchWeather()
+                }
+            }) {
+                Text("Refresh")
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
             }
-            let weather = try await weatherService.weather(for: location)
-            let temperature = weather.currentWeather.temperature.converted(to: .celsius)
-            self.currentTemperature = String(format: "%.1f°C", temperature.value) // 小数点以下1桁
-                
-        } catch {
-            print("Error fetching weather: \(error)")
-                self.locationName = "Error"
-                self.currentTemperature = "Failed to load weather"
-            
         }
-    }
-}
-
-
-//@main
-struct WeatherKitApp: App {
-    var body: some Scene {
-        WindowGroup {
-            WeatherView()
+        .padding()
+        .task {
+            await viewModel.fetchWeather()
         }
     }
 }
