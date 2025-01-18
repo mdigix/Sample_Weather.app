@@ -8,28 +8,25 @@ import SwiftUI
 @preconcurrency import WeatherKit
 import CoreLocation
 
-@MainActor
-class WeatherViewModel: ObservableObject {
-    private let weatherService = WeatherService()
+struct WeatherView: View {
+    @StateObject private var viewModel = WeatherViewModel()
     
-    @Published var currentTemperature: String = "Loading..."
-    @Published var weatherDescription: String = "Loading..."
-    
-    func fetchWeather() async {
-        let location = CLLocation(latitude: 35.6895, longitude: 139.6917)
-        
-        do {
-            let weather = try await weatherService.weather(for: location)
-            DispatchQueue.main.async {
-                self.currentTemperature = "\(weather.currentWeather.temperature.value)° \(weather.currentWeather.temperature.unit.symbol)"
-                self.weatherDescription = weather.currentWeather.condition.description
-            }
-        } catch {
-            print("Error fetching weather: \(error)")
-            DispatchQueue.main.async {
-                self.currentTemperature = "Error"
-                self.weatherDescription = "Failed to load weather"
-            }
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Current Temperature")
+                .font(.headline)
+            
+            Text(viewModel.currentTemperature)
+                .font(.largeTitle)
+                .bold()
+            
+            Text(viewModel.weatherDescription)
+                .font(.subheadline)
+                .foregroundColor(.gray)
+        }
+        .padding()
+        .task {
+            await viewModel.fetchWeather()
         }
     }
 }
