@@ -37,7 +37,7 @@ class WeatherViewModel: ObservableObject {
 }
 
 
-@main
+//@main
 struct WeatherKitApp: App {
     var body: some Scene {
         WindowGroup {
