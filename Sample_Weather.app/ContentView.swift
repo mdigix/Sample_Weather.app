@@ -6,35 +6,42 @@
 //
 
 import SwiftUI
+@preconcurrency import WeatherKit
+import CoreLocation
 
-struct WeatherView: View {
-    @StateObject private var viewModel = WeatherViewModel()
+@MainActor
+class WeatherViewModel: ObservableObject {
+    private let weatherService = WeatherService()
     
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("Current Temperature")
-                .font(.headline)
-            
-            Text(viewModel.currentTemperature)
-                .font(.largeTitle)
-                .bold()
-            
-            Text(viewModel.weatherDescription)
-                .font(.subheadline)
-                .foregroundColor(.gray)
-        }
-        .padding()
-        .task {
-            await viewModel.fetchWeather()
+    @Published var currentTemperature: String = "Loading..."
+    @Published var weatherDescription: String = "Loading..."
+    
+    func fetchWeather() async {
+        // サンプル位置情報: 緯度と経度（東京の座標）
+        let location = CLLocation(latitude: 35.6895, longitude: 139.6917)
+        
+        do {
+            let weather = try await weatherService.weather(for: location)
+            DispatchQueue.main.async {
+                self.currentTemperature = "\(weather.currentWeather.temperature.value)° \(weather.currentWeather.temperature.unit.symbol)"
+                self.weatherDescription = weather.currentWeather.condition.description
+            }
+        } catch {
+            print("Error fetching weather: \(error)")
+            DispatchQueue.main.async {
+                self.currentTemperature = "Error"
+                self.weatherDescription = "Failed to load weather"
+            }
         }
     }
 }
 
 
+@main
 struct WeatherKitApp: App {
     var body: some Scene {
         WindowGroup {
-            WeatherView() // ここでWeatherViewを表示
+            WeatherView()
         }
     }
 }
