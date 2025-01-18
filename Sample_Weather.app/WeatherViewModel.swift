@@ -18,7 +18,7 @@ class WeatherViewModel: ObservableObject {
     
     func fetchWeather() async {
         // サンプル位置情報: 緯度と経度（東京の座標）
-        let location = CLLocation(latitude: 35.6895, longitude: 139.6917)
+        let location = CLLocation(latitude: 34.7691, longitude: 137.3914)
         
         do {
             let placemarks = try await geoCoder.reverseGeocodeLocation(location)
